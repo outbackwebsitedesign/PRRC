@@ -1,0 +1,200 @@
+// PRRC data model — every piece of content the app renders lives here,
+// so nothing is hardcoded in the React components.
+//
+// SQLite is used for zero-config local development. To move to Postgres,
+// change `provider` to "postgresql" and point DATABASE_URL at your server;
+// the models below are portable as-is.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Public marketing site
+// ---------------------------------------------------------------------------
+
+// Capabilities. `shortDesc` is used on the home page and the title in the
+// footer; `longDesc` + points are used on the Services page.
+model Service {
+  id        Int            @id @default(autoincrement())
+  icon      String
+  title     String
+  shortDesc String
+  longDesc  String
+  order     Int            @default(0)
+  points    ServicePoint[]
+}
+
+model ServicePoint {
+  id        Int     @id @default(autoincrement())
+  text      String
+  order     Int     @default(0)
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  serviceId Int
+}
+
+// Numeric callouts. `group` distinguishes home / dashboard / training-progress.
+model Stat {
+  id    Int     @id @default(autoincrement())
+  group String
+  label String
+  value String
+  icon  String?
+  order Int     @default(0)
+}
+
+// "Who we are" value cards (About page).
+model Value {
+  id    Int    @id @default(autoincrement())
+  icon  String
+  title String
+  desc  String
+  order Int    @default(0)
+}
+
+// Open roles (Careers page).
+model Job {
+  id       Int    @id @default(autoincrement())
+  code     String @unique
+  title    String
+  location String
+  type     String
+  order    Int    @default(0)
+}
+
+// Sector / region options for the Contact form select.
+model Sector {
+  id    Int    @id @default(autoincrement())
+  label String
+  order Int    @default(0)
+}
+
+// Single row of command contact details (Contact page + footer).
+model ContactInfo {
+  id        Int    @id @default(autoincrement())
+  hqAddress String
+  opsLine   String
+  email     String
+}
+
+// ---------------------------------------------------------------------------
+// Management (ops) portal + field app share the Mission table
+// ---------------------------------------------------------------------------
+
+model Mission {
+  id                Int     @id @default(autoincrement())
+  code              String  @unique
+  name              String
+  sector            String
+  status            String
+  statusLabel       String
+  brief             String?
+  activeOnDashboard Boolean @default(true)
+  assignedToField   Boolean @default(false)
+  order             Int     @default(0)
+}
+
+model Request {
+  id          Int    @id @default(autoincrement())
+  code        String @unique
+  org         String
+  type        String
+  status      String
+  statusLabel String
+  time        String
+  order       Int    @default(0)
+}
+
+model Report {
+  id    Int    @id @default(autoincrement())
+  title String
+  desc  String
+  date  String
+  order Int    @default(0)
+}
+
+model Personnel {
+  id          Int    @id @default(autoincrement())
+  callsign    String
+  name        String
+  role        String
+  sector      String
+  status      String
+  statusLabel String
+  order       Int    @default(0)
+}
+
+// ---------------------------------------------------------------------------
+// Training portal
+// ---------------------------------------------------------------------------
+
+model Course {
+  id          Int    @id @default(autoincrement())
+  code        String @unique
+  icon        String
+  title       String
+  desc        String
+  modules     Int
+  duration    String
+  status      String
+  statusLabel String
+  order       Int    @default(0)
+}
+
+model Lesson {
+  id    Int    @id @default(autoincrement())
+  code  String @unique
+  icon  String
+  title String
+  desc  String
+  order Int    @default(0)
+}
+
+model Certification {
+  id          Int    @id @default(autoincrement())
+  title       String
+  issued      String
+  expires     String
+  status      String
+  statusLabel String
+  order       Int    @default(0)
+}
+
+model ScheduleItem {
+  id          Int    @id @default(autoincrement())
+  when        String
+  title       String
+  location    String
+  status      String
+  statusLabel String
+  order       Int    @default(0)
+}
+
+// ---------------------------------------------------------------------------
+// Field app
+// ---------------------------------------------------------------------------
+
+model Alert {
+  id          Int    @id @default(autoincrement())
+  time        String
+  text        String
+  status      String
+  statusLabel String
+  order       Int    @default(0)
+}
+
+// Single row describing the field terminal status bar.
+model FieldStatus {
+  id          Int    @id @default(autoincrement())
+  unit        String
+  subtitle    String
+  gps         String
+  commsStatus String
+  commsLabel  String
+}

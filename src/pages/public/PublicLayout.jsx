@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../../design-system/index.js';
+import { useApi } from '../../api/client.js';
 import logoIcon from '../../assets/logo-icon.png';
-import { services } from './data.js';
 
 const NAV = [
   { to: '/', label: 'Home', end: true },
@@ -22,6 +22,8 @@ function ScrollToTop() {
 
 export default function PublicLayout() {
   const navigate = useNavigate();
+  const { data: services } = useApi('/services');
+  const { data: contact } = useApi('/contact-info');
   return (
     <div
       style={{
@@ -135,7 +137,7 @@ export default function PublicLayout() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={footerHeading}>Services</div>
-            {services.slice(0, 4).map((fs) => (
+            {(services || []).slice(0, 4).map((fs) => (
               <NavLink key={fs.title} to="/services" style={footerLink}>
                 {fs.title}
               </NavLink>
@@ -144,10 +146,10 @@ export default function PublicLayout() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={footerHeading}>Contact</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-secondary)' }}>
-              command@prrc.ops
+              {contact?.email}
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-secondary)' }}>
-              +61 1800 772 555
+              {contact?.opsLine}
             </div>
           </div>
         </div>

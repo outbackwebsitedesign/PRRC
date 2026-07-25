@@ -1,7 +1,9 @@
 import { Icon } from '../../design-system/index.js';
-import { values, ICON_STYLE } from './data.js';
+import { useApi } from '../../api/client.js';
+import { ICON_STYLE } from './data.js';
 
 export default function About() {
+  const { data: values } = useApi('/values');
   return (
     <section style={{ padding: '80px 48px', display: 'flex', flexDirection: 'column', gap: 56, maxWidth: 1100 }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 680 }}>
@@ -37,7 +39,7 @@ export default function About() {
         </p>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
-        {values.map((v) => (
+        {(values || []).map((v) => (
           <div
             key={v.title}
             style={{

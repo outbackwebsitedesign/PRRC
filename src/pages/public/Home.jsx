@@ -1,9 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { Button, Icon } from '../../design-system/index.js';
-import { services, stats, ICON_STYLE } from './data.js';
+import { useApi } from '../../api/client.js';
+import { ICON_STYLE } from './data.js';
 
 export default function Home() {
   const navigate = useNavigate();
+  const { data: services } = useApi('/services');
+  const { data: stats } = useApi('/stats?group=home');
   return (
     <section style={{ display: 'flex', flexDirection: 'column' }}>
       <div
@@ -78,7 +81,7 @@ export default function Home() {
           borderBottom: '1px solid var(--border-subtle)',
         }}
       >
-        {stats.map((s) => (
+        {(stats || []).map((s) => (
           <div
             key={s.label}
             style={{
@@ -135,7 +138,7 @@ export default function Home() {
           </h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
-          {services.map((svc) => (
+          {(services || []).map((svc) => (
             <div
               key={svc.title}
               style={{
@@ -161,7 +164,7 @@ export default function Home() {
                 {svc.title}
               </div>
               <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: 1.5, color: 'var(--text-secondary)', flex: 1 }}>
-                {svc.desc}
+                {svc.shortDesc}
               </div>
               <button
                 onClick={() => navigate('/services')}

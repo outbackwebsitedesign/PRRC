@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Badge, Button, Icon, Tag } from '../design-system/index.js';
+import { useApi } from '../api/client.js';
 import logoIcon from '../assets/logo-icon.png';
 
 const ICON_STYLE = { color: 'var(--accent-primary)' };
@@ -11,34 +12,21 @@ const NAV_DEFS = [
   { id: 'alerts', label: 'Alerts', icon: 'bell' },
 ];
 
-const MISSIONS = [
-  { id: 'PRRC-2291', name: 'Wildfire Evacuation Support', sector: 'Sector 7', status: 'danger', statusLabel: 'Critical', brief: 'Assist local fire units with evacuation of residential zone. Establish perimeter and coordinate with incident command.' },
-  { id: 'PRRC-2288', name: 'Coastal Flood Search & Rescue', sector: 'Sector 3', status: 'warning', statusLabel: 'Active', brief: 'Conduct door-to-door search of flooded coastal blocks. Extract stranded residents to staging area.' },
-  { id: 'PRRC-2281', name: 'Perimeter Security Detail', sector: 'Sector 12', status: 'success', statusLabel: 'Stable', brief: 'Maintain perimeter security at client facility. Log all entries and report anomalies to command.' },
-];
-
-const ALERTS = [
-  { time: '14:02', text: 'Sector 7 upgraded to Critical — all units acknowledge.', status: 'danger', statusLabel: 'Urgent' },
-  { time: '13:41', text: 'Weather advisory: high winds expected in Sector 3 after 16:00.', status: 'warning', statusLabel: 'Advisory' },
-  { time: '12:55', text: 'Checkpoint Bravo relocated 400m north of original grid.', status: 'info', statusLabel: 'Update' },
-  { time: '11:30', text: 'Shift handover complete — Team Alpha on station.', status: 'neutral', statusLabel: 'Log' },
-];
-
 function fmtClock(d) {
   return d.toTimeString().slice(0, 5);
 }
 
-function Missions({ onSelect }) {
+function Missions({ missions, onSelect }) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 24, gap: 16, overflow: 'auto' }}>
       <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, textTransform: 'uppercase' }}>
         Assigned Missions
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {MISSIONS.map((m) => (
+        {missions.map((m) => (
           <button
-            key={m.id}
-            onClick={() => onSelect(m.id)}
+            key={m.code}
+            onClick={() => onSelect(m.code)}
             style={{
               textAlign: 'left',
               background: 'var(--surface-card)',
@@ -53,7 +41,7 @@ function Missions({ onSelect }) {
               minHeight: 76,
             }}
           >
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-muted)' }}>{m.id}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-muted)' }}>{m.code}</div>
             <div
               style={{
                 fontFamily: 'var(--font-heading)',
@@ -78,6 +66,7 @@ function Missions({ onSelect }) {
 }
 
 function Detail({ selected, onBack, onCheckIn }) {
+  if (!selected) return <div style={{ flex: 1 }} />;
   return (
     <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 24, gap: 16, overflow: 'auto' }}>
@@ -101,7 +90,7 @@ function Detail({ selected, onBack, onCheckIn }) {
         </button>
         <div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', marginBottom: 6 }}>
-            {selected.id}
+            {selected.code}
           </div>
           <div style={{ fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 700, textTransform: 'uppercase' }}>
             {selected.name}
@@ -214,7 +203,7 @@ function CheckIn({ clock, onDone }) {
   );
 }
 
-function Alerts() {
+function Alerts({ alerts }) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 24, gap: 16, overflow: 'auto' }}>
       <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, textTransform: 'uppercase' }}>
@@ -231,7 +220,7 @@ function Alerts() {
           overflow: 'hidden',
         }}
       >
-        {ALERTS.map((a) => (
+        {alerts.map((a) => (
           <div
             key={a.time}
             style={{
@@ -255,15 +244,21 @@ function Alerts() {
 
 export default function FieldApp() {
   const [screen, setScreen] = useState('missions');
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedCode, setSelectedCode] = useState(null);
   const [clock, setClock] = useState(fmtClock(new Date()));
+
+  const { data: missionsData } = useApi('/missions?scope=field');
+  const { data: alertsData } = useApi('/alerts');
+  const { data: status } = useApi('/field-status');
+  const missions = missionsData || [];
+  const alerts = alertsData || [];
 
   useEffect(() => {
     const t = setInterval(() => setClock(fmtClock(new Date())), 15000);
     return () => clearInterval(t);
   }, []);
 
-  const selected = MISSIONS.find((m) => m.id === selectedId) || MISSIONS[0];
+  const selected = missions.find((m) => m.code === selectedCode) || missions[0];
 
   return (
     <div
@@ -293,19 +288,19 @@ export default function FieldApp() {
           <img src={logoIcon} style={{ height: 30, width: 'auto', filter: 'brightness(0) invert(1)' }} alt="PRRC" />
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
             <div style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700, letterSpacing: 'var(--tracking-wider)', textTransform: 'uppercase' }}>
-              MDT-7 · UNIT ALPHA-1
+              {status?.unit}
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: 'var(--tracking-wide)' }}>
-              VEHICLE TERMINAL · FIELD OPS
+              {status?.subtitle}
             </div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--text-secondary)' }}>
             <Icon name="mapPin" size={16} style={ICON_STYLE} />
-            34.9285° S, 138.6007° E
+            {status?.gps}
           </div>
-          <Badge status="success">Comms: Online</Badge>
+          {status ? <Badge status={status.commsStatus}>{status.commsLabel}</Badge> : null}
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, color: 'var(--text-primary)', minWidth: 72, textAlign: 'right' }}>
             {clock}
           </div>
@@ -376,12 +371,12 @@ export default function FieldApp() {
           </button>
         </div>
 
-        {screen === 'missions' && <Missions onSelect={(id) => { setSelectedId(id); setScreen('detail'); }} />}
+        {screen === 'missions' && <Missions missions={missions} onSelect={(code) => { setSelectedCode(code); setScreen('detail'); }} />}
         {screen === 'detail' && (
           <Detail selected={selected} onBack={() => setScreen('missions')} onCheckIn={() => setScreen('checkin')} />
         )}
         {screen === 'checkin' && <CheckIn clock={clock} onDone={() => setScreen('detail')} />}
-        {screen === 'alerts' && <Alerts />}
+        {screen === 'alerts' && <Alerts alerts={alerts} />}
       </div>
     </div>
   );

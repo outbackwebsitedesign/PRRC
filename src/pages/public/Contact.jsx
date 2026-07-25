@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Badge, Button, Input, Select } from '../../design-system/index.js';
-import { sectorOptions } from './data.js';
+import { useApi } from '../../api/client.js';
 
 export default function Contact() {
   const [formSent, setFormSent] = useState(false);
+  const { data: sectors } = useApi('/sectors');
+  const { data: contact } = useApi('/contact-info');
+  const sectorOptions = (sectors || []).map((s) => s.label);
   const submit = (e) => {
     e.preventDefault();
     setFormSent(true);
@@ -114,19 +117,19 @@ export default function Contact() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={contactLabel}>Command HQ</div>
               <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-primary)' }}>
-                44 Ridgeline Road, Ipswich QLD 4305
+                {contact?.hqAddress}
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={contactLabel}>Ops Line (24/7)</div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--text-primary)' }}>
-                +61 1800 772 555
+                {contact?.opsLine}
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={contactLabel}>Email</div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--text-primary)' }}>
-                command@prrc.ops
+                {contact?.email}
               </div>
             </div>
           </div>

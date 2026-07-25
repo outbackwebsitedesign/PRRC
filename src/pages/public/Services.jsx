@@ -1,7 +1,9 @@
 import { Icon } from '../../design-system/index.js';
-import { serviceDetails, ICON_STYLE, CHECK_STYLE } from './data.js';
+import { useApi } from '../../api/client.js';
+import { ICON_STYLE, CHECK_STYLE } from './data.js';
 
 export default function Services() {
+  const { data: services } = useApi('/services');
   return (
     <section style={{ padding: '80px 48px', display: 'flex', flexDirection: 'column', gap: 48, maxWidth: 1100 }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 680 }}>
@@ -35,7 +37,7 @@ export default function Services() {
         </p>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {serviceDetails.map((sd) => (
+        {(services || []).map((sd) => (
           <div
             key={sd.title}
             style={{
@@ -60,13 +62,13 @@ export default function Services() {
                 {sd.title}
               </div>
               <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-                {sd.desc}
+                {sd.longDesc}
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {sd.points.map((pt) => (
+              {(sd.points || []).map((pt) => (
                 <div
-                  key={pt}
+                  key={pt.id}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -77,7 +79,7 @@ export default function Services() {
                   }}
                 >
                   <Icon name="check" size={14} style={CHECK_STYLE} />
-                  {pt}
+                  {pt.text}
                 </div>
               ))}
             </div>

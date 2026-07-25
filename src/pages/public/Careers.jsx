@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../design-system/index.js';
-import { jobs } from './data.js';
+import { useApi } from '../../api/client.js';
 
 export default function Careers() {
   const navigate = useNavigate();
+  const { data: jobs } = useApi('/jobs');
   return (
     <section style={{ padding: '80px 48px', display: 'flex', flexDirection: 'column', gap: 48, maxWidth: 1100 }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 680 }}>
@@ -47,9 +48,9 @@ export default function Careers() {
           overflow: 'hidden',
         }}
       >
-        {jobs.map((j) => (
+        {(jobs || []).map((j) => (
           <div
-            key={j.id}
+            key={j.code}
             style={{
               background: 'var(--surface-card)',
               display: 'grid',
@@ -59,7 +60,7 @@ export default function Careers() {
               gap: 16,
             }}
           >
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)' }}>{j.id}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)' }}>{j.code}</div>
             <div style={{ fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
               {j.title}
             </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Badge, Button, Icon, Tabs } from '../design-system/index.js';
+import { useApi } from '../api/client.js';
 import logoIcon from '../assets/logo-icon.png';
 
 const ICON_STYLE = { color: 'var(--accent-primary)' };
@@ -10,42 +11,6 @@ const NAV_DEFS = [
   { id: 'missions', label: 'Missions', icon: 'mapPin' },
   { id: 'reports', label: 'Reports', icon: 'clock' },
   { id: 'personnel', label: 'Personnel', icon: 'radio' },
-];
-
-const STATS = [
-  { label: 'Active Missions', value: '12', icon: 'mapPin' },
-  { label: 'Teams Deployed', value: '7', icon: 'radio' },
-  { label: 'Open Alerts', value: '3', icon: 'alertTriangle' },
-  { label: 'Personnel Ready', value: '48', icon: 'shieldCheck' },
-];
-
-const MISSIONS = [
-  { id: 'PRRC-2291', name: 'Wildfire Evacuation Support', sector: 'Sector 7', status: 'danger', statusLabel: 'Critical' },
-  { id: 'PRRC-2288', name: 'Coastal Flood Search & Rescue', sector: 'Sector 3', status: 'warning', statusLabel: 'Active' },
-  { id: 'PRRC-2281', name: 'Perimeter Security Detail', sector: 'Sector 12', status: 'success', statusLabel: 'Stable' },
-  { id: 'PRRC-2276', name: 'Survival Training Deployment', sector: 'Sector 5', status: 'info', statusLabel: 'Briefing' },
-];
-
-const REQUESTS = [
-  { id: 'REQ-441', org: 'Coastal County Emergency Mgmt', type: 'Flood Response', status: 'warning', statusLabel: 'Pending Review', time: '2h ago' },
-  { id: 'REQ-440', org: 'Highland Fire District', type: 'Wildfire Evacuation', status: 'danger', statusLabel: 'Urgent', time: '4h ago' },
-  { id: 'REQ-438', org: 'Private Security Client', type: 'VIP Protection Detail', status: 'success', statusLabel: 'Approved', time: '1d ago' },
-  { id: 'REQ-435', org: 'Regional Red Cross', type: 'Search & Rescue Support', status: 'info', statusLabel: 'In Review', time: '2d ago' },
-];
-
-const REPORTS = [
-  { title: 'Q2 Deployment Summary', desc: '18 missions completed across 6 sectors.', date: 'Jul 1, 2026' },
-  { title: 'Wildfire Evacuation After-Action Report', desc: 'Sector 7 — full personnel and timeline breakdown.', date: 'Jun 22, 2026' },
-  { title: 'Training Readiness Audit', desc: 'Survival & tactical certification status by unit.', date: 'Jun 14, 2026' },
-  { title: 'Equipment Inventory Report', desc: 'Fleet, comms gear, and medical supply levels.', date: 'Jun 3, 2026' },
-];
-
-const PERSONNEL = [
-  { callsign: 'ALPHA-1', name: 'R. Vance', role: 'Team Lead', sector: 'Sector 7', status: 'danger', statusLabel: 'Deployed' },
-  { callsign: 'BRAVO-2', name: 'M. Okafor', role: 'SAR Specialist', sector: 'Sector 3', status: 'warning', statusLabel: 'Deployed' },
-  { callsign: 'CHARLIE-3', name: 'T. Reyes', role: 'Security Operator', sector: 'Sector 12', status: 'success', statusLabel: 'Standby' },
-  { callsign: 'DELTA-4', name: 'S. Novak', role: 'Instructor', sector: 'Sector 5', status: 'info', statusLabel: 'Briefing' },
-  { callsign: 'ECHO-5', name: 'J. Park', role: 'Medic', sector: 'HQ', status: 'success', statusLabel: 'Standby' },
 ];
 
 const REQ_TABS = [
@@ -83,6 +48,8 @@ const mono = (color) => ({ fontFamily: 'var(--font-mono)', fontSize: 12, color }
 const bodyCell = { fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-primary)', fontWeight: 500 };
 
 function Dashboard() {
+  const { data: stats } = useApi('/stats?group=dashboard');
+  const { data: missions } = useApi('/missions?scope=dashboard');
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: 32, flex: 1, overflow: 'auto' }}>
       <div>
@@ -90,7 +57,7 @@ function Dashboard() {
         <div style={pageTitle}>Command Dashboard</div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
-        {STATS.map((s) => (
+        {(stats || []).map((s) => (
           <div
             key={s.label}
             style={{
@@ -128,9 +95,9 @@ function Dashboard() {
           Active Missions
         </div>
         <div style={rowStack}>
-          {MISSIONS.map((m) => (
+          {(missions || []).map((m) => (
             <div
-              key={m.id}
+              key={m.code}
               style={{
                 background: 'var(--surface-card)',
                 display: 'grid',
@@ -140,7 +107,7 @@ function Dashboard() {
                 gap: 12,
               }}
             >
-              <div style={mono('var(--text-muted)')}>{m.id}</div>
+              <div style={mono('var(--text-muted)')}>{m.code}</div>
               <div style={bodyCell}>{m.name}</div>
               <div style={mono('var(--text-secondary)')}>{m.sector}</div>
               <Badge status={m.status}>{m.statusLabel}</Badge>
@@ -154,6 +121,7 @@ function Dashboard() {
 
 function Missions() {
   const [tab, setTab] = useState('all');
+  const { data: requests } = useApi('/requests');
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 32, flex: 1, overflow: 'auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -165,9 +133,9 @@ function Missions() {
       </div>
       <Tabs tabs={REQ_TABS} active={tab} onChange={setTab} />
       <div style={rowStack}>
-        {REQUESTS.map((r) => (
+        {(requests || []).map((r) => (
           <div
-            key={r.id}
+            key={r.code}
             style={{
               background: 'var(--surface-card)',
               display: 'grid',
@@ -177,7 +145,7 @@ function Missions() {
               gap: 12,
             }}
           >
-            <div style={mono('var(--text-muted)')}>{r.id}</div>
+            <div style={mono('var(--text-muted)')}>{r.code}</div>
             <div style={bodyCell}>{r.org}</div>
             <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)' }}>{r.type}</div>
             <Badge status={r.status}>{r.statusLabel}</Badge>
@@ -190,6 +158,7 @@ function Missions() {
 }
 
 function Reports() {
+  const { data: reports } = useApi('/reports');
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 32, flex: 1, overflow: 'auto' }}>
       <div>
@@ -197,7 +166,7 @@ function Reports() {
         <div style={pageTitle}>Reports</div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 16 }}>
-        {REPORTS.map((r) => (
+        {(reports || []).map((r) => (
           <div
             key={r.title}
             style={{
@@ -232,6 +201,7 @@ function Reports() {
 }
 
 function Personnel() {
+  const { data: personnel } = useApi('/personnel');
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 32, flex: 1, overflow: 'auto' }}>
       <div>
@@ -239,7 +209,7 @@ function Personnel() {
         <div style={pageTitle}>Personnel</div>
       </div>
       <div style={rowStack}>
-        {PERSONNEL.map((p) => (
+        {(personnel || []).map((p) => (
           <div
             key={p.callsign}
             style={{
