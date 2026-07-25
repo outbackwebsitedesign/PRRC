@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/prrc-design-system-adeff24e-60e6-45fb-bfa7-8afb1face0dc/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/prrc-design-system-adeff24e-60e6-45fb-bfa7-8afb1face0dc/tokens/colors.css">
+<link rel="stylesheet" href="_ds/prrc-design-system-adeff24e-60e6-45fb-bfa7-8afb1face0dc/tokens/typography.css">
+<link rel="stylesheet" href="_ds/prrc-design-system-adeff24e-60e6-45fb-bfa7-8afb1face0dc/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/prrc-design-system-adeff24e-60e6-45fb-bfa7-8afb1face0dc/tokens/effects.css">
+<link rel="stylesheet" href="_ds/prrc-design-system-adeff24e-60e6-45fb-bfa7-8afb1face0dc/styles.css">
+<script src="_ds/prrc-design-system-adeff24e-60e6-45fb-bfa7-8afb1face0dc/_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--surface-app)}</style>
+</helmet>
+
+<div style="display:flex;height:100vh;font-family:var(--font-body);color:var(--text-primary)">
+
+  <div style="width:220px;background:var(--color-black);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;flex-shrink:0" data-screen-label="Ops / Sidebar">
+    <div style="display:flex;align-items:center;gap:10px;padding:20px 18px;border-bottom:1px solid var(--border-subtle)">
+      <img src="_ds/prrc-design-system-adeff24e-60e6-45fb-bfa7-8afb1face0dc/assets/logo-icon.png" style="height:28px;width:auto;filter:brightness(0) invert(1)" alt="PRRC"/>
+      <div style="font-family:var(--font-heading);font-weight:700;font-size:13px;color:var(--text-primary);letter-spacing:var(--tracking-wide);line-height:1.15">PRRC<div style="font-size:9px;color:var(--text-muted);letter-spacing:var(--tracking-widest)">OPS PORTAL</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;padding:12px;gap:2px">
+      <sc-for list="{{ navItems }}" as="it" hint-placeholder-count="4">
+        <button onClick="{{ it.onClick }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:{{ it.bg }};border:none;border-left:{{ it.border }};color:{{ it.color }};font-family:var(--font-heading);font-size:12px;font-weight:600;letter-spacing:var(--tracking-wider);text-transform:uppercase;text-align:left;cursor:pointer;border-radius:var(--radius-sm)">
+          <x-import component-from-global-scope="PRRCDesignSystem_adeff2.Icon" name="{{ it.icon }}" size="16" hint-size="16px,16px"></x-import>{{ it.label }}
+        </button>
+      </sc-for>
+    </div>
+  </div>
+
+  <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="Ops / Dashboard" style="display:flex;flex-direction:column;gap:24px;padding:32px;flex:1;overflow:auto">
+    <div>
+      <div style="font-family:var(--font-heading);font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--accent-primary);font-weight:600">Operations Overview</div>
+      <div style="font-family:var(--font-heading);font-size:28px;font-weight:700;text-transform:uppercase;color:var(--text-primary)">Command Dashboard</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+      <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+        <div style="background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:18px;display:flex;flex-direction:column;gap:8px">
+          <x-import component-from-global-scope="PRRCDesignSystem_adeff2.Icon" name="{{ s.icon }}" size="18" style="{{ iconStyle }}" hint-size="18px,18px"></x-import>
+          <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;color:var(--text-primary)">{{ s.value }}</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:var(--tracking-wide)">{{ s.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div>
+      <div style="font-family:var(--font-heading);font-size:14px;font-weight:700;color:var(--text-primary);text-transform:uppercase;margin-bottom:12px;letter-spacing:var(--tracking-wide)">Active Missions</div>
+      <div style="display:flex;flex-direction:column;gap:1px;background:var(--border-subtle);border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden">
+        <sc-for list="{{ missions }}" as="m" hint-placeholder-count="4">
+          <div style="background:var(--surface-card);display:grid;grid-template-columns:120px 1fr 120px 100px;align-items:center;padding:14px 18px;gap:12px">
+            <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">{{ m.id }}</div>
+            <div style="font-family:var(--font-body);font-size:14px;color:var(--text-primary);font-weight:500">{{ m.name }}</div>
+            <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">{{ m.sector }}</div>
+            <x-import component-from-global-scope="PRRCDesignSystem_adeff2.Badge" status="{{ m.status }}" hint-size="auto,24px">{{ m.statusLabel }}</x-import>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isMissions }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Ops / Missions" style="display:flex;flex-direction:column;gap:20px;padding:32px;flex:1;overflow:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:var(--font-heading);font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--accent-primary);font-weight:600">Intake</div>
+        <div style="font-family:var(--font-heading);font-size:28px;font-weight:700;text-transform:uppercase;color:var(--text-primary)">Mission Requests</div>
+      </div>
+      <x-import component-from-global-scope="PRRCDesignSystem_adeff2.Button" hint-size="auto,44px">New Request</x-import>
+    </div>
+    <x-import component-from-global-scope="PRRCDesignSystem_adeff2.Tabs" tabs="{{ reqTabs }}" active="{{ activeTab }}" onChange="{{ setTab }}" hint-size="100%,44px"></x-import>
+    <div style="display:flex;flex-direction:column;gap:1px;background:var(--border-subtle);border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden">
+      <sc-for list="{{ requests }}" as="r" hint-placeholder-count="4">
+        <div style="background:var(--surface-card);display:grid;grid-template-columns:100px 1fr 200px 120px 80px;align-items:center;padding:14px 18px;gap:12px">
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">{{ r.id }}</div>
+          <div style="font-family:var(--font-body);font-size:14px;color:var(--text-primary);font-weight:500">{{ r.org }}</div>
+          <div style="font-family:var(--font-body);font-size:13px;color:var(--text-secondary)">{{ r.type }}</div>
+          <x-import component-from-global-scope="PRRCDesignSystem_adeff2.Badge" status="{{ r.status }}" hint-size="auto,24px">{{ r.statusLabel }}</x-import>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">{{ r.time }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isReports }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Ops / Reports" style="display:flex;flex-direction:column;gap:20px;padding:32px;flex:1;overflow:auto">
+    <div>
+      <div style="font-family:var(--font-heading);font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--accent-primary);font-weight:600">Archive</div>
+      <div style="font-family:var(--font-heading);font-size:28px;font-weight:700;text-transform:uppercase;color:var(--text-primary)">Reports</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+      <sc-for list="{{ reports }}" as="r" hint-placeholder-count="4">
+        <div style="background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:18px;display:flex;flex-direction:column;gap:10px">
+          <x-import component-from-global-scope="PRRCDesignSystem_adeff2.Icon" name="clock" size="16" style="{{ mutedIconStyle }}" hint-size="16px,16px"></x-import>
+          <div style="font-family:var(--font-heading);font-size:15px;font-weight:700;color:var(--text-primary);text-transform:uppercase">{{ r.title }}</div>
+          <div style="font-family:var(--font-body);font-size:13px;color:var(--text-secondary)">{{ r.desc }}</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">{{ r.date }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isPersonnel }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Ops / Personnel" style="display:flex;flex-direction:column;gap:20px;padding:32px;flex:1;overflow:auto">
+    <div>
+      <div style="font-family:var(--font-heading);font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--accent-primary);font-weight:600">Roster</div>
+      <div style="font-family:var(--font-heading);font-size:28px;font-weight:700;text-transform:uppercase;color:var(--text-primary)">Personnel</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;background:var(--border-subtle);border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden">
+      <sc-for list="{{ personnel }}" as="p" hint-placeholder-count="5">
+        <div style="background:var(--surface-card);display:grid;grid-template-columns:100px 1fr 160px 140px 100px;align-items:center;padding:14px 18px;gap:12px">
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">{{ p.callsign }}</div>
+          <div style="font-family:var(--font-body);font-size:14px;color:var(--text-primary);font-weight:500">{{ p.name }}</div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">{{ p.role }}</div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">{{ p.sector }}</div>
+          <x-import component-from-global-scope="PRRCDesignSystem_adeff2.Badge" status="{{ p.status }}" hint-size="auto,24px">{{ p.statusLabel }}</x-import>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:800}}">
+const ICON_STYLE = { color: 'var(--accent-primary)' };
+const MUTED_ICON_STYLE = { color: 'var(--text-muted)' };
+
+const NAV_DEFS = [
+  { id: 'dashboard', label: 'Dashboard', icon: 'shieldCheck' },
+  { id: 'missions', label: 'Missions', icon: 'mapPin' },
+  { id: 'reports', label: 'Reports', icon: 'clock' },
+  { id: 'personnel', label: 'Personnel', icon: 'radio' }
+];
+
+const MISSIONS = [
+  { id: 'PRRC-2291', name: 'Wildfire Evacuation Support', sector: 'Sector 7', status: 'danger', statusLabel: 'Critical' },
+  { id: 'PRRC-2288', name: 'Coastal Flood Search & Rescue', sector: 'Sector 3', status: 'warning', statusLabel: 'Active' },
+  { id: 'PRRC-2281', name: 'Perimeter Security Detail', sector: 'Sector 12', status: 'success', statusLabel: 'Stable' },
+  { id: 'PRRC-2276', name: 'Survival Training Deployment', sector: 'Sector 5', status: 'info', statusLabel: 'Briefing' }
+];
+
+const REQUESTS = [
+  { id: 'REQ-441', org: 'Coastal County Emergency Mgmt', type: 'Flood Response', status: 'warning', statusLabel: 'Pending Review', time: '2h ago' },
+  { id: 'REQ-440', org: 'Highland Fire District', type: 'Wildfire Evacuation', status: 'danger', statusLabel: 'Urgent', time: '4h ago' },
+  { id: 'REQ-438', org: 'Private Security Client', type: 'VIP Protection Detail', status: 'success', statusLabel: 'Approved', time: '1d ago' },
+  { id: 'REQ-435', org: 'Regional Red Cross', type: 'Search & Rescue Support', status: 'info', statusLabel: 'In Review', time: '2d ago' }
+];
+
+const REPORTS = [
+  { title: 'Q2 Deployment Summary', desc: '18 missions completed across 6 sectors.', date: 'Jul 1, 2026' },
+  { title: 'Wildfire Evacuation After-Action Report', desc: 'Sector 7 — full personnel and timeline breakdown.', date: 'Jun 22, 2026' },
+  { title: 'Training Readiness Audit', desc: 'Survival & tactical certification status by unit.', date: 'Jun 14, 2026' },
+  { title: 'Equipment Inventory Report', desc: 'Fleet, comms gear, and medical supply levels.', date: 'Jun 3, 2026' }
+];
+
+const PERSONNEL = [
+  { callsign: 'ALPHA-1', name: 'R. Vance', role: 'Team Lead', sector: 'Sector 7', status: 'danger', statusLabel: 'Deployed' },
+  { callsign: 'BRAVO-2', name: 'M. Okafor', role: 'SAR Specialist', sector: 'Sector 3', status: 'warning', statusLabel: 'Deployed' },
+  { callsign: 'CHARLIE-3', name: 'T. Reyes', role: 'Security Operator', sector: 'Sector 12', status: 'success', statusLabel: 'Standby' },
+  { callsign: 'DELTA-4', name: 'S. Novak', role: 'Instructor', sector: 'Sector 5', status: 'info', statusLabel: 'Briefing' },
+  { callsign: 'ECHO-5', name: 'J. Park', role: 'Medic', sector: 'HQ', status: 'success', statusLabel: 'Standby' }
+];
+
+class Component extends DCLogic {
+  state = { screen: 'dashboard', tab: 'all' };
+  renderVals() {
+    const screen = this.state.screen;
+    const navItems = NAV_DEFS.map(it => {
+      const active = it.id === screen;
+      return {
+        ...it,
+        bg: active ? 'var(--surface-panel)' : 'transparent',
+        border: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
+        color: active ? 'var(--text-primary)' : 'var(--text-muted)',
+        onClick: () => this.setState({ screen: it.id })
+      };
+    });
+    const stats = [
+      { label: 'Active Missions', value: '12', icon: 'mapPin' },
+      { label: 'Teams Deployed', value: '7', icon: 'radio' },
+      { label: 'Open Alerts', value: '3', icon: 'alertTriangle' },
+      { label: 'Personnel Ready', value: '48', icon: 'shieldCheck' }
+    ];
+    return {
+      navItems,
+      isDashboard: screen === 'dashboard', isMissions: screen === 'missions', isReports: screen === 'reports', isPersonnel: screen === 'personnel',
+      stats, missions: MISSIONS, requests: REQUESTS, reports: REPORTS, personnel: PERSONNEL,
+      reqTabs: [{ id: 'all', label: 'All' }, { id: 'urgent', label: 'Urgent' }, { id: 'pending', label: 'Pending' }, { id: 'approved', label: 'Approved' }],
+      activeTab: this.state.tab, setTab: (id) => this.setState({ tab: id }),
+      iconStyle: ICON_STYLE, mutedIconStyle: MUTED_ICON_STYLE
+    };
+  }
+}
+</script>
+</body>
+</html>
