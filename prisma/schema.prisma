@@ -76,9 +76,10 @@ model Sector {
 }
 
 // Single row of command contact details (Contact page + footer).
+// hqAddress is optional — when null, the HQ block is not shown.
 model ContactInfo {
-  id        Int    @id @default(autoincrement())
-  hqAddress String
+  id        Int     @id @default(autoincrement())
+  hqAddress String?
   opsLine   String
   email     String
 }

@@ -85,9 +85,9 @@ const sectors = [
 ];
 
 const contactInfo = {
-  hqAddress: '44 Ridgeline Road, Ipswich QLD 4305',
-  opsLine: '+61 1800 772 555',
-  email: 'command@prrc.ops',
+  hqAddress: null,
+  opsLine: '0497 522 768',
+  email: 'daniel.prrc@gmail.com',
 };
 
 const missions = [

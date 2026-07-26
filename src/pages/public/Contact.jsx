@@ -114,12 +114,14 @@ export default function Contact() {
             }}
           >
             <Badge status="success">Standby Status: Ready</Badge>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div style={contactLabel}>Command HQ</div>
-              <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-primary)' }}>
-                {contact?.hqAddress}
+            {contact?.hqAddress ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={contactLabel}>Command HQ</div>
+                <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-primary)' }}>
+                  {contact.hqAddress}
+                </div>
               </div>
-            </div>
+            ) : null}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={contactLabel}>Ops Line (24/7)</div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--text-primary)' }}>
